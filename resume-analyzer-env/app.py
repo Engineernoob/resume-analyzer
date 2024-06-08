@@ -11,3 +11,4 @@ def analyze():
 
 if __name__ == "__main__":
     app.run(debug=True)
+# This script defines a Flask app that provides an API endpoint for analyzing resumes. The /analyze route accepts a POST request with a JSON payload containing the resume text. It then calls the analyze_resume function from resume-parser.py to extract contact information, education, experience, and skills from the resume text. Finally, it returns the analysis as a JSON response.
