@@ -1,47 +1,58 @@
-import spacy
+import nltk
+from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk import ne_chunk, pos_tag
+from nltk.corpus import stopwords
 
-# Load SpaCy model
-nlp = spacy.load("en_core_web_sm")
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('maxent_ne_chunker')
+nltk.download('words')
 
 def parse_resume(resume_text):
-    # Process the text with SpaCy
-    doc = nlp(resume_text)
-    return doc
+    sentences = sent_tokenize(resume_text)
+    return sentences
 
-def extract_contact_info(doc):
+def extract_contact_info(sentences):
     contact_info = {}
-    for entity in doc.ents:
-        if entity.label_ in ["PERSON", "EMAIL", "PHONE"]:
-            contact_info[entity.label_] = entity.text
+    # Basic heuristic to extract contact info from sentences
+    for sentence in sentences:
+        words = word_tokenize(sentence)
+        if '@' in sentence:
+            contact_info['EMAIL'] = sentence
+        elif any(char.isdigit() for char in sentence):
+            contact_info['PHONE'] = sentence
     return contact_info
 
-def extract_education(doc):
+def extract_education(sentences):
     education = []
-    for entity in doc.ents:
-        if entity.label_ == "ORG" and "university" in entity.text.lower():
-            education.append(entity.text)
+    for sentence in sentences:
+        if 'university' in sentence.lower() or 'college' in sentence.lower():
+            education.append(sentence)
     return education
 
-def extract_experience(doc):
+def extract_experience(sentences):
     experience = []
-    for sent in doc.sents:
-        if "experience" in sent.text.lower():
-            experience.append(sent.text)
+    for sentence in sentences:
+        if 'experience' in sentence.lower():
+            experience.append(sentence)
     return experience
 
-def extract_skills(doc):
+def extract_skills(sentences):
     skills = []
-    for token in doc:
-        if token.pos_ == "NOUN":
-            skills.append(token.text)
+    stop_words = set(stopwords.words('english'))
+    for sentence in sentences:
+        words = word_tokenize(sentence)
+        for word in words:
+            if word.isalpha() and word.lower() not in stop_words:
+                skills.append(word)
     return skills
 
 def analyze_resume(resume_text):
-    doc = parse_resume(resume_text)
-    contact_info = extract_contact_info(doc)
-    education = extract_education(doc)
-    experience = extract_experience(doc)
-    skills = extract_skills(doc)
+    sentences = parse_resume(resume_text)
+    contact_info = extract_contact_info(sentences)
+    education = extract_education(sentences)
+    experience = extract_experience(sentences)
+    skills = extract_skills(sentences)
 
     return {
         "contact_info": contact_info,
@@ -63,4 +74,3 @@ if __name__ == "__main__":
     """
     analysis = analyze_resume(sample_resume)
     print(analysis)
-# This script defines a set of functions for analyzing resumes. It uses the SpaCy library to process the resume text and extract contact information, education, experience, and skills. The analyze_resume function orchestrates the analysis process by calling the individual extraction functions and returning the results as a dictionary.
