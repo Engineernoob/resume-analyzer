@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify , render_template
-from resume_parser import analyze_resume
+from resume_parser import analyze_resume, match_job
 from schemas import resume_schema, analysis_schema, v
 
 app = Flask(__name__)
@@ -21,6 +21,17 @@ def analyze():
         return jsonify({'error': 'Invalid analysis output'}), 500
 
     return jsonify(analysis)
+
+@app.route("/match", methods=["POST"])
+def match():
+    if not v.validate(request.json, analysis_schema):
+        return jsonify(v.errors), 400
+    
+    resume_data = request.json
+    job_description = request.json["job_description"]
+    score = match_job(resume_data, job_description)
+    
+    return jsonify({"score": score})
 
 if __name__ == "__main__":
     app.run(debug=True)
