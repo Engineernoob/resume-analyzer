@@ -61,6 +61,38 @@ def analyze_resume(resume_text):
         "skills": skills,
     }
 
+def extract_certifications(doc):
+    certifications = []
+    for sent in doc.sents:
+        if "certified" in sent.text.lower() or "certification" in sent.text.lower():
+            certifications.append(sent.text)
+    return certifications
+
+def extract_languages(doc):
+    languages = []
+    for token in doc:
+        if token.ent_type_ == "LANGUAGE":
+            languages.append(token.text)
+    return languages
+
+def analyze_resume(resume_text):
+    doc = parse_resume(resume_text)
+    contact_info = extract_contact_info(doc)
+    education = extract_education(doc)
+    experience = extract_experience(doc)
+    skills = extract_skills(doc)
+    certifications = extract_certifications(doc)
+    languages = extract_languages(doc)
+
+    return {
+        "contact_info": contact_info,
+        "education": education,
+        "experience": experience,
+        "skills": skills,
+        "certifications": certifications,
+        "languages": languages,
+    }
+
 if __name__ == "__main__":
     sample_resume = """John Doe
     Email: john.doe@example.com
