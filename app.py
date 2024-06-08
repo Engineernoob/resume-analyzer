@@ -1,14 +1,21 @@
 from flask import Flask, request, jsonify
 from resume_parser import analyze_resume
+from schemas import resume_schema, analysis_schema, v
 
 app = Flask(__name__)
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
+    if not v.validate(request.json, resume_schema):
+        return jsonify(v.errors), 400
+    
     resume_text = request.json["resume_text"]
     analysis = analyze_resume(resume_text)
+    
+    if not v.validate(analysis, analysis_schema):
+        return jsonify({'error': 'Invalid analysis output'}), 500
+
     return jsonify(analysis)
 
 if __name__ == "__main__":
     app.run(debug=True)
-# This script defines a Flask app that provides an API endpoint for analyzing resumes. The /analyze route accepts a POST request with a JSON payload containing the resume text. It then calls the analyze_resume function from resume-parser.py to extract contact information, education, experience, and skills from the resume text. Finally, it returns the analysis as a JSON response.
