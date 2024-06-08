@@ -63,3 +63,4 @@ if __name__ == "__main__":
     """
     analysis = analyze_resume(sample_resume)
     print(analysis)
+# This script defines a set of functions for analyzing resumes. It uses the SpaCy library to process the resume text and extract contact information, education, experience, and skills. The analyze_resume function orchestrates the analysis process by calling the individual extraction functions and returning the results as a dictionary.
