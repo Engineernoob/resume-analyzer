@@ -1,10 +1,15 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify , render_template
 from resume_parser import analyze_resume
 from schemas import resume_schema, analysis_schema, v
 
 app = Flask(__name__)
 
+@app.route("/")
+def index():
+    return render_template("index.html")
+
 @app.route("/analyze", methods=["POST"])
+
 def analyze():
     if not v.validate(request.json, resume_schema):
         return jsonify(v.errors), 400
