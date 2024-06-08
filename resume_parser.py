@@ -93,6 +93,14 @@ def analyze_resume(resume_text):
         "languages": languages,
     }
 
+def match_job(resume_data, job_description):
+    # Example matching logic
+    score = 0
+    for skill in resume_data["skills"]:
+        if skill in job_description:
+            score += 1
+    return score
+
 if __name__ == "__main__":
     sample_resume = """John Doe
     Email: john.doe@example.com
