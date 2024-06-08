@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analyzer</title>
+</head>
+<body>
+    <h1>Resume Analyzer</h1>
+    <form id="resume-form">
+        <textarea name="resume_text" rows="10" cols="50" placeholder="Paste your resume text here"></textarea>
+        <button type="submit">Analyze</button>
+    </form>
+    <div id="analysis-result"></div>
+    <script>
+        document.getElementById('resume-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(event.target);
+            fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json()).then(data => {
+                document.getElementById('analysis-result').innerHTML = JSON.stringify(data, null, 2);
+            });
+        });
+    </script>
+</body>
+</html>
