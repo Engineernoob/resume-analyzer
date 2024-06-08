@@ -18,7 +18,12 @@
             var formData = new FormData(event.target);
             fetch('/analyze', {
                 method: 'POST',
-                body: formData
+                body: JSON.stringify({
+                    resume_text: formData.get('resume_text')
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }).then(response => response.json()).then(data => {
                 document.getElementById('analysis-result').innerHTML = JSON.stringify(data, null, 2);
             });
