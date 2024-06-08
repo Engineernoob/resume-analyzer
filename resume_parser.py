@@ -3,10 +3,12 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk import ne_chunk, pos_tag
 from nltk.corpus import stopwords
 
+# Download necessary NLTK data
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('maxent_ne_chunker')
 nltk.download('words')
+nltk.download('stopwords')
 
 def parse_resume(resume_text):
     sentences = sent_tokenize(resume_text)
@@ -14,7 +16,6 @@ def parse_resume(resume_text):
 
 def extract_contact_info(sentences):
     contact_info = {}
-    # Basic heuristic to extract contact info from sentences
     for sentence in sentences:
         words = word_tokenize(sentence)
         if '@' in sentence:
@@ -47,42 +48,30 @@ def extract_skills(sentences):
                 skills.append(word)
     return skills
 
+def extract_certifications(sentences):
+    certifications = []
+    for sentence in sentences:
+        if "certified" in sentence.lower() or "certification" in sentence.lower():
+            certifications.append(sentence)
+    return certifications
+
+def extract_languages(sentences):
+    languages = []
+    for sentence in sentences:
+        words = word_tokenize(sentence)
+        for word, pos in pos_tag(words):
+            if pos == 'NNP' and word.lower() not in stopwords.words('english'):
+                languages.append(word)
+    return languages
+
 def analyze_resume(resume_text):
     sentences = parse_resume(resume_text)
     contact_info = extract_contact_info(sentences)
     education = extract_education(sentences)
     experience = extract_experience(sentences)
     skills = extract_skills(sentences)
-
-    return {
-        "contact_info": contact_info,
-        "education": education,
-        "experience": experience,
-        "skills": skills,
-    }
-
-def extract_certifications(doc):
-    certifications = []
-    for sent in doc.sents:
-        if "certified" in sent.text.lower() or "certification" in sent.text.lower():
-            certifications.append(sent.text)
-    return certifications
-
-def extract_languages(doc):
-    languages = []
-    for token in doc:
-        if token.ent_type_ == "LANGUAGE":
-            languages.append(token.text)
-    return languages
-
-def analyze_resume(resume_text):
-    doc = parse_resume(resume_text)
-    contact_info = extract_contact_info(doc)
-    education = extract_education(doc)
-    experience = extract_experience(doc)
-    skills = extract_skills(doc)
-    certifications = extract_certifications(doc)
-    languages = extract_languages(doc)
+    certifications = extract_certifications(sentences)
+    languages = extract_languages(sentences)
 
     return {
         "contact_info": contact_info,
@@ -114,3 +103,4 @@ if __name__ == "__main__":
     """
     analysis = analyze_resume(sample_resume)
     print(analysis)
+    job_description = "We are looking for a Python developer with experience in machine learning and NLP"
